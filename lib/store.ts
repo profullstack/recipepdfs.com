@@ -24,7 +24,7 @@ async function readJson(): Promise<StoreData> {
 
 async function writeJson(data: StoreData) {
   await mkdir(dataDir, { recursive: true });
-  const tmp = `${dataFile}.${process.pid}.${Date.now()}.tmp`;
+  const tmp = `${dataFile}.${process.pid}.${randomUUID()}.tmp`;
   await writeFile(tmp, `${JSON.stringify(data, null, 2)}\n`, 'utf8');
   await rename(tmp, dataFile);
 }
