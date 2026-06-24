@@ -55,6 +55,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <span>Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks.</span>
           </footer>
         </div>
+      <script async src="https://feedback.profullstack.com/embed/profullstack-feedback.js" data-property="recipepdfs.com"></script>
       </body>
     </html>
   );
