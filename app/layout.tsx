@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
+import { FeedbackWidget } from '@profullstack/stack/feedback';
 import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
@@ -55,7 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <span>Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks.</span>
           </footer>
         </div>
-      <script async src="https://feedback.profullstack.com/embed/profullstack-feedback.js" data-property="recipepdfs.com"></script>
+      <FeedbackWidget property="recipepdfs.com" />
       </body>
     </html>
   );

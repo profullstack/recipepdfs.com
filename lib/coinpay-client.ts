@@ -1,5 +1,3 @@
-import crypto from 'node:crypto';
-
 const DEFAULT_COINPAY_API_URL = 'https://coinpayportal.com/api';
 
 export type CoinpayCurrency = 'usdc_sol' | 'sol' | 'usdc_pol' | 'usdc_eth' | 'usdt' | 'btc' | 'eth';
@@ -94,34 +92,6 @@ export function checkoutUrlFor(response: CoinpayCreatePaymentResponse): string |
 
 export function paymentIdFor(response: CoinpayCreatePaymentResponse): string | null {
   return response.payment_id ?? response.payment?.id ?? null;
-}
-
-export function verifyCoinpayWebhook(
-  rawBody: string,
-  signatureHeader: string | null,
-  webhookSecret: string,
-): boolean {
-  if (!signatureHeader) return false;
-  try {
-    const parts = signatureHeader.split(',');
-    const timestamp = parts.find((part) => part.startsWith('t='))?.slice(2);
-    const signature = parts.find((part) => part.startsWith('v1='))?.slice(3);
-    if (!timestamp || !signature) return false;
-    const ts = Number.parseInt(timestamp, 10);
-    if (!Number.isFinite(ts)) return false;
-    if (Math.abs(Math.floor(Date.now() / 1000) - ts) > 300) return false;
-
-    const expected = crypto
-      .createHmac('sha256', webhookSecret)
-      .update(`${timestamp}.${rawBody}`)
-      .digest('hex');
-    const a = Buffer.from(signature, 'hex');
-    const b = Buffer.from(expected, 'hex');
-    if (a.length !== b.length) return false;
-    return crypto.timingSafeEqual(a, b);
-  } catch {
-    return false;
-  }
 }
 
 export function normalizeWebhook(payload: CoinpayWebhookPayload) {

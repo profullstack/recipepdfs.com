@@ -50,18 +50,18 @@ describe('coinpay client', () => {
   });
 
   it('verifies valid webhook HMAC signatures', async () => {
-    const { verifyCoinpayWebhook } = await import('@/lib/coinpay-client');
+    const { verifyCoinPayWebhook } = await import('@profullstack/stack/coinpay');
     const body = JSON.stringify({ type: 'payment.confirmed', data: { payment_id: 'pay_123' } });
     const ts = Math.floor(Date.now() / 1000).toString();
     const sig = crypto.createHmac('sha256', 'secret').update(`${ts}.${body}`).digest('hex');
-    expect(verifyCoinpayWebhook(body, `t=${ts},v1=${sig}`, 'secret')).toBe(true);
+    expect(verifyCoinPayWebhook({ signature: `t=${ts},v1=${sig}`, rawBody: body, secret: 'secret' })).toBe(true);
   });
 
   it('rejects stale webhook HMAC signatures', async () => {
-    const { verifyCoinpayWebhook } = await import('@/lib/coinpay-client');
+    const { verifyCoinPayWebhook } = await import('@profullstack/stack/coinpay');
     const body = '{}';
     const ts = (Math.floor(Date.now() / 1000) - 700).toString();
     const sig = crypto.createHmac('sha256', 'secret').update(`${ts}.${body}`).digest('hex');
-    expect(verifyCoinpayWebhook(body, `t=${ts},v1=${sig}`, 'secret')).toBe(false);
+    expect(verifyCoinPayWebhook({ signature: `t=${ts},v1=${sig}`, rawBody: body, secret: 'secret' })).toBe(false);
   });
 });
