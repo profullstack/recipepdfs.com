@@ -21,6 +21,11 @@ export const gateway = createGateway({
   coinpay: { apiKey: env("COINPAY_X402_KEY") },
   payTo: env("CRAWL_PAY_TO"),
   contact: "mailto:support@recipepdfs.com",
+  // The discovery surfaces stay free for everyone, training crawlers included:
+  // an agent has to be able to see what is on offer, and what it costs, before
+  // it can decide to pay. The recipes themselves are what is being sold, so
+  // /api/v1/recipes/<slug> is deliberately NOT open.
+  openPaths: ["/llms.txt", "/api/v1/recipes", "/api/mcp"],
 });
 
 /** Resolves to a Response for a refused crawler, or undefined to carry on. */
