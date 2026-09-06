@@ -85,10 +85,57 @@ async function cachePathFor(slug: string): Promise<string> {
 }
 
 /**
+ * The library listing is memoised for a short window.
+ *
+ * Building it costs a readdir plus two stats per PDF, and both the index route
+ * and every single-recipe lookup need it. At the request rates the paid tiers
+ * promise that is thousands of syscalls a second for a directory that changes
+ * when somebody uploads a cookbook. A few seconds of staleness is the right
+ * trade; `LIBRARY_TTL_MS=0` disables it.
+ */
+const libraryTtlMs = Number(process.env.LIBRARY_TTL_MS ?? 5000);
+let libraryCache: { at: number; entries: LibraryEntry[] } | undefined;
+
+/**
+ * Converted records held in process, bounded so a large library cannot grow
+ * the heap without limit. Oldest entry out when full — recipe traffic is
+ * heavily skewed to a few popular slugs, so a plain bound is enough.
+ */
+const memoLimit = Number(process.env.RECORD_MEMO_LIMIT ?? 500);
+const recordMemo = new Map<
+  string,
+  { mtimeMs: number; bytes: number; record: PublicRecipe }
+>();
+
+function rememberRecord(
+  slug: string,
+  mtimeMs: number,
+  bytes: number,
+  record: PublicRecipe,
+): void {
+  if (memoLimit <= 0) return;
+  if (recordMemo.size >= memoLimit) {
+    const oldest = recordMemo.keys().next().value;
+    if (oldest !== undefined) recordMemo.delete(oldest);
+  }
+  recordMemo.set(slug, { mtimeMs, bytes, record });
+}
+
+/** Drops the memoised listing and records, so an upload shows up at once. */
+export function invalidateLibrary(): void {
+  libraryCache = undefined;
+  recordMemo.clear();
+}
+
+/**
  * Every PDF in the library, without opening any of them.
  * Slugs are derived from the filename so they are stable across conversions.
  */
 export async function listLibrary(): Promise<LibraryEntry[]> {
+  if (libraryCache && libraryTtlMs > 0 && Date.now() - libraryCache.at < libraryTtlMs) {
+    return libraryCache.entries;
+  }
+
   const entries = await readdir(pdfDir, { withFileTypes: true }).catch(() => []);
 
   const pdfs = entries
@@ -96,43 +143,43 @@ export async function listLibrary(): Promise<LibraryEntry[]> {
     .sort((a, b) => a.name.localeCompare(b.name));
 
   const seen = new Map<string, number>();
-  const library: LibraryEntry[] = [];
 
-  for (const pdf of pdfs) {
-    const title = titleFromFileName(pdf.name);
-    let slug = slugify(title);
-    const count = seen.get(slug) ?? 0;
-    seen.set(slug, count + 1);
-    if (count > 0) slug = `${slug}-${count + 1}`;
+  // The two stats per PDF are independent, so run them together rather than
+  // walking the directory serially.
+  const library = (
+    await Promise.all(
+      pdfs.map(async (pdf) => {
+        const title = titleFromFileName(pdf.name);
+        let slug = slugify(title);
+        const count = seen.get(slug) ?? 0;
+        seen.set(slug, count + 1);
+        if (count > 0) slug = `${slug}-${count + 1}`;
 
-    const source = sourceFromFileName(pdf.name);
-    let bytes = 0;
-    try {
-      bytes = (await stat(path.join(pdfDir, pdf.name))).size;
-    } catch {
-      // A file that vanished between readdir and stat is simply skipped.
-      continue;
-    }
+        const source = sourceFromFileName(pdf.name);
 
-    let converted = false;
-    try {
-      await stat(await cachePathFor(slug));
-      converted = true;
-    } catch {
-      converted = false;
-    }
+        const [info, cached] = await Promise.all([
+          stat(path.join(pdfDir, pdf.name)).catch(() => undefined),
+          stat(await cachePathFor(slug)).catch(() => undefined),
+        ]);
 
-    library.push({
-      slug,
-      title,
-      file: pdf.name,
-      publisher: source.name,
-      sourceUrl: source.url,
-      bytes,
-      converted,
-    });
-  }
+        // A file that vanished between readdir and stat is simply skipped.
+        if (!info) return undefined;
 
+        const entry: LibraryEntry = {
+          slug,
+          title,
+          file: pdf.name,
+          publisher: source.name,
+          sourceUrl: source.url,
+          bytes: info.size,
+          converted: Boolean(cached),
+        };
+        return entry;
+      }),
+    )
+  ).filter((entry): entry is LibraryEntry => entry !== undefined);
+
+  libraryCache = { at: Date.now(), entries: library };
   return library;
 }
 
@@ -198,8 +245,20 @@ export async function getRecipe(slug: string): Promise<PublicRecipe | undefined>
   const info = await stat(path.join(pdfDir, entry.file)).catch(() => undefined);
   if (!info) return undefined;
 
+  // In-process memo, checked against the source file's identity so a replaced
+  // PDF still invalidates it. Saves a readFile and a JSON.parse on the hot
+  // path, which is the whole cost of a served request once converted.
+  const memo = recordMemo.get(slug);
+  if (memo && memo.mtimeMs === info.mtimeMs && memo.bytes === info.size) {
+    return memo.record;
+  }
+
   const cached = await readCache(slug, info.mtimeMs, info.size);
-  if (cached) return buildPublicRecord(cached);
+  if (cached) {
+    const record = buildPublicRecord(cached);
+    rememberRecord(slug, info.mtimeMs, info.size, record);
+    return record;
+  }
 
   const markdown = await markdownFor(entry.file);
   if (!markdown) return undefined;
@@ -211,7 +270,9 @@ export async function getRecipe(slug: string): Promise<PublicRecipe | undefined>
   const recipe: Recipe = { ...parsed, slug };
   await writeCache(slug, { mtimeMs: info.mtimeMs, bytes: info.size, recipe });
 
-  return buildPublicRecord(recipe);
+  const record = buildPublicRecord(recipe);
+  rememberRecord(slug, info.mtimeMs, info.size, record);
+  return record;
 }
 
 export type SearchOptions = {

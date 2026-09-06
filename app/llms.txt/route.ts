@@ -1,4 +1,5 @@
 import { listLibrary } from '@/lib/recipe/store';
+import { TIERS, windowMs } from '@/lib/rate-limit';
 
 /**
  * The agent-facing front door.
@@ -28,6 +29,15 @@ export async function GET(request: Request) {
     .slice(0, 15)
     .map((entry) => `- [${entry.title}](${origin}/api/v1/recipes/${entry.slug})`)
     .join('\n');
+
+  const perMinute = (limit: number) =>
+    windowMs === 60_000 ? `${limit}/min` : `${limit} per ${Math.round(windowMs / 1000)}s`;
+
+  const tierLines = TIERS.map((tier) =>
+    tier.priceCents === 0
+      ? `- **${tier.name}** — ${perMinute(tier.limit)}, no charge, no signup.`
+      : `- **${tier.name}** — ${perMinute(tier.limit)}, $${(tier.priceCents / 100).toFixed(2)} per day.`,
+  ).join('\n');
 
   const body = `# recipepdfs.com
 
@@ -68,17 +78,25 @@ ${publisherLines}
 
 ## Access and pricing
 
-People and retrieval crawlers (OAI-SearchBot, ChatGPT-User, Claude-SearchBot,
-Claude-User, PerplexityBot, Googlebot, Google-Extended, Bingbot) read
-everything for free — they cite back, and we would rather be cited.
+Nothing here is gated on who you are. Training crawlers, retrieval crawlers
+and people are all welcome and all read the same data. What is sold is
+throughput.
 
-AI *training* crawlers pay: $1.00 per day of access, settled over x402 in
-USDC. See [${origin}/crawl](${origin}/crawl) for the offer, or request any
-page with a training-crawler User-Agent to receive the 402 and its terms.
-Multi-day passes: \`${origin}/crawl?days=7\`.
+${tierLines}
 
-This index, /llms.txt and /crawl are free to everyone, always, so an agent can
-work out what is on offer before paying for it.
+Every response carries \`x-ratelimit-limit\`, \`x-ratelimit-remaining\`,
+\`x-ratelimit-reset\` and \`x-ratelimit-tier\`, so you can pace yourself
+instead of discovering the ceiling by hitting it.
+
+Go over your allowance and the next response is 402 with an x402 offer for the
+tier above. Pay it — USDC, settled by CoinPay, no signup and no human in the
+loop — and the 200 body holds a pass. Send it back as \`x-crawl-pass\` or
+\`Authorization: Bearer <pass>\` and your ceiling goes up for the day.
+Multi-day: \`${origin}/crawl?days=7\`.
+
+Full machine-readable terms: [${origin}/pricing](${origin}/pricing).
+/llms.txt, /pricing and /robots.txt stay readable even when you are over your
+allowance, so a refused agent can always find out why and what to do.
 
 ## Sample
 
