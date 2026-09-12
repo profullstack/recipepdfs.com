@@ -1,0 +1,29 @@
+{
+  "openaccess": "0.1",
+  "name": "RecipePDFs",
+  "url": "https://recipepdfs.com",
+  "operator": "https://logicsrc.com/.well-known/openprofile.md",
+  "redirect_uris": [
+    "https://recipepdfs.com/api/v1/openaccess/callback"
+  ],
+  "jwks": {
+    "keys": [
+      {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "kid": "NKEnWSIAk5N1",
+        "x": "sLsl2UQ-JNgM-o2sIDLEn6hYuvnehoCirdjQL6_P14U",
+        "alg": "EdDSA",
+        "use": "sig"
+      }
+    ]
+  },
+  "scopes": {},
+  "honours": [
+    "profullstack.com/all-access"
+  ],
+  "webhooks": "https://recipepdfs.com/api/v1/openaccess/events",
+  "hubs": [
+    "https://openaccess.logicsrc.com"
+  ]
+}
