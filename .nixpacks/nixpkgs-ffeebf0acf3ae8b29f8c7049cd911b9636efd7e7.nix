@@ -16,6 +16,6 @@ in with pkgs;
           mkdir -p $out/etc/profile.d
           cp ${myLibraries} $out/etc/profile.d/ffeebf0acf3ae8b29f8c7049cd911b9636efd7e7-env.sh
         '')
-        nodejs_18 pnpm-9_x
+        nodejs_22 pnpm-9_x
       ];
     }
