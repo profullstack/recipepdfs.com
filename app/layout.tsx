@@ -15,6 +15,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 
   return (
     <html lang="en">
+      <head>
+        <script data-site="baa96667-70da-4700-9564-d0bfcec6c7ae" src="https://crawlproof.com/stats.js" async></script>
+      </head>
       <body>
         <div className="shell">
           <nav className="nav">
