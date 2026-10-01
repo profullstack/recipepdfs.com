@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { recipeFromHtml, recipeFromJsonLdNode } from '@/lib/recipe/from-jsonld';
 
 function page(jsonLd: unknown): string {
