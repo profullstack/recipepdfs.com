@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { recipeFromMarkdown, sourceFromFileName } from '@/lib/recipe/from-markdown';
 
 /** The Allrecipes print layout: groups at `###`, steps at `####`. */

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'bun:test';
 import { durationMinutes, recipeToMarkdown } from '@/lib/recipe/store';
 import { buildPublicRecord } from '@/lib/recipe/types';
 import type { Recipe } from '@/lib/recipe/types';

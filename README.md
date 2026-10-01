@@ -14,10 +14,14 @@ Coinpay-authenticated marketplace for free and paid recipe PDF cookbooks.
 ## Local setup
 
 ```bash
-pnpm install
+bun install
 cp .env.example .env.local
-pnpm dev
+bun dev
 ```
+
+Bun is the package manager, the runtime (`bun --bun next ...`) and the test runner
+(`bun test`). Production runs the Next standalone server under Bun, built from
+`.nixpacks/Dockerfile`.
 
 Register the OAuth callback in Coinpay as:
 

@@ -1,17 +1,16 @@
 import crypto from 'node:crypto';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, spyOn } from 'bun:test';
 
 describe('coinpay client', () => {
   let originalEnv: NodeJS.ProcessEnv;
-  let fetchSpy: ReturnType<typeof vi.spyOn>;
+  let fetchSpy: ReturnType<typeof spyOn>;
 
   beforeEach(() => {
     originalEnv = { ...process.env };
     process.env.COINPAY_API_KEY = 'cp_test_key';
     process.env.COINPAY_MERCHANT_ID = 'biz_test';
     process.env.APP_URL = 'https://recipepdfs.com';
-    vi.resetModules();
-    fetchSpy = vi.spyOn(globalThis, 'fetch') as never;
+    fetchSpy = spyOn(globalThis, 'fetch') as never;
   });
 
   afterEach(() => {
