@@ -1,4 +1,5 @@
 import { FREE_LIMIT, TIERS, windowMs } from "@/lib/rate-limit";
+import { siteUrl } from "@/lib/site-url";
 
 /**
  * Everyone is welcome, including AI training crawlers.
@@ -11,8 +12,8 @@ import { FREE_LIMIT, TIERS, windowMs } from "@/lib/rate-limit";
  */
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+export async function GET() {
+  const origin = siteUrl();
   const perWindow = `${FREE_LIMIT} requests per ${Math.round(windowMs / 1000)}s`;
 
   const tierLines = TIERS.map((tier) =>

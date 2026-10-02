@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { siteHref } from '@/lib/site-url';
 import {
   checkoutUrlFor,
   createCoinpayPayment,
@@ -13,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.redirect(new URL('/api/coinpay/connect?next=/browse', req.url), 302);
+  if (!user) return NextResponse.redirect(siteHref('/api/coinpay/connect?next=/browse'), 302);
 
   const form = await req.formData();
   const cookbookId = form.get('cookbookId');
@@ -26,10 +27,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: 'Cookbook not found' }, { status: 404 });
   }
   if (await hasCookbookAccess({ cookbook, userSub: user.sub })) {
-    return NextResponse.redirect(new URL(`/api/download/${cookbook.id}`, req.url), 302);
+    return NextResponse.redirect(siteHref(`/api/download/${cookbook.id}`), 302);
   }
   if (cookbook.priceUsd <= 0) {
-    return NextResponse.redirect(new URL(`/api/download/${cookbook.id}`, req.url), 302);
+    return NextResponse.redirect(siteHref(`/api/download/${cookbook.id}`), 302);
   }
 
   const currency = (typeof form.get('currency') === 'string' ? form.get('currency') : 'usdc_sol') as CoinpayCurrency;
