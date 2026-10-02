@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { siteUrl } from '@/lib/site-url';
 import { TIERS, windowMs } from '@/lib/rate-limit';
 
 /**
@@ -9,8 +10,8 @@ import { TIERS, windowMs } from '@/lib/rate-limit';
  */
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  const origin = new URL(request.url).origin;
+export async function GET() {
+  const origin = siteUrl();
   const seconds = Math.round(windowMs / 1000);
 
   return NextResponse.json(

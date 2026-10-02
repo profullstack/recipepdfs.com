@@ -1,4 +1,5 @@
 import { createGateway, readPass } from "@profullstack/x402-gateway";
+import { siteUrl } from "@/lib/site-url";
 import { x402Proxy } from "@profullstack/x402-gateway/next";
 import { paidTiers, secretForTier, tierById, type Tier } from "@/lib/rate-limit";
 
@@ -21,8 +22,6 @@ const env = (name: string) => process.env[name];
 
 const baseSecret = () => env("COINPAY_X402_KEY") ?? "";
 
-const siteUrl = () =>
-  env("SITE_URL") || env("NEXT_PUBLIC_SITE_URL") || "https://recipepdfs.com";
 
 /**
  * One gateway per paid tier, each priced and signed for that tier.

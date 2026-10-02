@@ -24,6 +24,12 @@ RUN bun run build
 
 FROM oven/bun:1.4.0-slim AS runtime
 WORKDIR /app
+# PDF import: lib/recipe/store.ts converts a PDF on first request by running
+# scripts/pdf-to-markdown.py, which needs python3 and pypdf and nothing else.
+# Debian's packaged pypdf keeps this to one apt layer with no pip or compiler.
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 python3-pypdf \
+ && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
@@ -34,6 +40,8 @@ ENV HOSTNAME=0.0.0.0
 COPY --from=build --chown=bun:bun /app/.next/standalone ./
 COPY --from=build --chown=bun:bun /app/.next/static ./.next/static
 COPY --from=build --chown=bun:bun /app/public ./public
+# The converter is run by path, so ship it explicitly rather than relying on tracing.
+COPY --from=build --chown=bun:bun /app/scripts/pdf-to-markdown.py ./scripts/pdf-to-markdown.py
 # lib/store.ts keeps its JSON store in ./.data (process.cwd()), so /app itself must
 # be writable by the non-root user. There is no volume: the store starts from the
 # seed on every container start, exactly as it did on the Node image.

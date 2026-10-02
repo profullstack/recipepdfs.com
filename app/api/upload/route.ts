@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
+import { siteHref } from '@/lib/site-url';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { NextResponse } from 'next/server';
@@ -22,7 +23,7 @@ function text(form: FormData, key: string) {
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user) return NextResponse.redirect(new URL('/api/coinpay/connect?next=/upload', req.url), 302);
+  if (!user) return NextResponse.redirect(siteHref('/api/coinpay/connect?next=/upload'), 302);
 
   const form = await req.formData();
   const file = form.get('pdf');
@@ -81,5 +82,5 @@ export async function POST(req: Request) {
     rewriteStatus: text(form, 'aiRewriteRequested') === '1' ? 'queued' : 'not_requested',
   });
 
-  return NextResponse.redirect(new URL(`/cookbooks/${cookbook.slug}`, req.url), 302);
+  return NextResponse.redirect(siteHref(`/cookbooks/${cookbook.slug}`), 302);
 }

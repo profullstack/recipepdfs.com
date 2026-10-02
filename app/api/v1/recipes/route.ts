@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { searchLibrary } from '@/lib/recipe/store';
+import { siteUrl } from '@/lib/site-url';
 
 /**
  * The library index.
@@ -22,7 +23,7 @@ export async function GET(request: Request) {
     offset: Number.isFinite(offset) ? offset : 0,
   });
 
-  const origin = url.origin;
+  const origin = siteUrl();
 
   return NextResponse.json(
     {
