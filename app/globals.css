@@ -395,6 +395,15 @@ h3 {
   padding: 24px clamp(18px, 5vw, 64px);
 }
 
+.footer .webring {
+  display: flex;
+  gap: 10px;
+}
+
+.footer .webring a {
+  color: inherit;
+}
+
 @media (max-width: 840px) {
   .nav {
     align-items: flex-start;
