@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
-import { FeedbackWidget } from '@profullstack/stack/feedback';
 import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
@@ -64,7 +63,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </nav>
           </footer>
         </div>
-      <FeedbackWidget property="recipepdfs.com" />
       </body>
     </html>
   );
