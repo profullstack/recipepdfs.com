@@ -20,6 +20,9 @@ import { NextResponse, type NextRequest } from "next/server";
  * refuses anyone, buying one immediately opens the door again.
  */
 export async function proxy(request: NextRequest) {
+  // The status.profullstack.com health check is never metered or sold.
+  if (request.nextUrl.pathname === "/api/health") return NextResponse.next();
+
   const paidTier = await tierOfRequest(request);
   const tier = paidTier ?? freeTier();
 
