@@ -385,25 +385,6 @@ h3 {
   text-transform: uppercase;
 }
 
-.footer {
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: space-between;
-  padding: 24px clamp(18px, 5vw, 64px);
-}
-
-.footer .webring {
-  display: flex;
-  gap: 10px;
-}
-
-.footer .webring a {
-  color: inherit;
-}
-
 @media (max-width: 840px) {
   .nav {
     align-items: flex-start;
