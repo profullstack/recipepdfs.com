@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
+import { Footer } from '@profullstack/footer/react';
 import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
@@ -53,16 +54,10 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </div>
           </nav>
           {children}
-          <footer className="footer">
-            <span>RecipePDFs.com</span>
-            <span>Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks.</span>
-            <nav className="webring" aria-label="Profullstack webring">
-              <a href="https://rssamplifier.com/ring/profullstack/previous?from=https%3A%2F%2Frecipepdfs.com%2F" rel="prev">{"<<"}</a>
-              <a href="https://rssamplifier.com/ring/profullstack">Profullstack</a>
-              <a href="https://rssamplifier.com/ring/profullstack/next?from=https%3A%2F%2Frecipepdfs.com%2F" rel="next">{">>"}</a>
-              <a href="https://rssamplifier.com/ring/profullstack/random?from=https%3A%2F%2Frecipepdfs.com%2F" title="Random site" aria-label="Random site">{"⚄"}</a>
-            </nav>
-          </footer>
+          <Footer
+            site="https://recipepdfs.com/"
+            tagline="Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks."
+          />
         </div>
       </body>
     </html>
