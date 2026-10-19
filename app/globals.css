@@ -438,26 +438,3 @@ h3 {
 .cp-ad[data-cp-filled][data-format="banner_300x250"] {
   min-height: 266px;
 }
-
-.site-footer {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem 1.25rem;
-  margin-top: 2rem;
-  padding: 1.5rem 0;
-  border-top: 1px solid color-mix(in srgb, currentColor 14%, transparent);
-  font-size: 0.875rem;
-  color: color-mix(in srgb, currentColor 62%, transparent);
-}
-
-.site-footer a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.site-footer a:hover,
-.site-footer a:focus-visible {
-  text-decoration: underline;
-}
