@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
-import { Footer } from '@profullstack/footer/react';
 import { AdUnit } from '@/components/AdUnit';
+import { PitFooter } from '@/components/PitFooter';
 import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
@@ -55,13 +55,16 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               )}
             </div>
           </nav>
-          {children}
           <AdUnit />
-          <Footer
-            site="https://recipepdfs.com/"
-            tagline="Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks."
-          />
+          {children}
+          <footer className="site-footer">
+            <span>&copy; {new Date().getFullYear()} <a href="https://profullstack.com/">Profullstack, Inc.</a></span>
+            <Link href="/pricing">Pricing</Link>
+            <a href="https://github.com/profullstack/recipepdfs.com">GitHub</a>
+            <a href="mailto:support@profullstack.com">Contact</a>
+          </footer>
         </div>
+        <PitFooter />
       </body>
     </html>
   );
