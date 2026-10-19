@@ -55,8 +55,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               )}
             </div>
           </nav>
-          {children}
           <AdUnit />
+          {children}
           <Footer
             site="https://recipepdfs.com/"
             tagline="Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks."
