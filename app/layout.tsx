@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Footer } from '@profullstack/footer/react';
+import { AdUnit } from '@/components/AdUnit';
 import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
@@ -17,6 +18,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="en">
       <head>
         <script data-site="baa96667-70da-4700-9564-d0bfcec6c7ae" src="https://crawlproof.com/stats.js" async></script>
+        <script src="https://crawlproof.com/ad.js" async></script>
       </head>
       <body>
         <div className="shell">
@@ -54,6 +56,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             </div>
           </nav>
           {children}
+          <AdUnit />
           <Footer
             site="https://recipepdfs.com/"
             tagline="Coinpay OAuth for accounts. Coinpay checkout for paid cookbooks."
