@@ -414,8 +414,7 @@ h3 {
 /*
  * CrawlProof ad unit: zero height until ad.js starts a fill (it sets
  * data-cp-filled, and removes it again on an empty response), so an unsold or
- * blocked slot leaves no hole. The reserved height is the format plus the
- * "Advertisement" caption ad.js draws above banners.
+ * blocked slot leaves no hole. text_link only: one 40px line.
  */
 .cp-ad {
   display: flex;
@@ -428,13 +427,7 @@ h3 {
 
 .cp-ad[data-cp-filled] {
   height: auto;
-  margin: 2rem 0;
-}
-
-.cp-ad[data-cp-filled][data-format="banner_728x90"] {
-  min-height: 106px;
-}
-
-.cp-ad[data-cp-filled][data-format="banner_300x250"] {
-  min-height: 266px;
+  min-height: 40px;
+  margin: 0.5rem 0;
+  align-items: stretch;
 }
