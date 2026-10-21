@@ -114,10 +114,10 @@ export default async function HomePage() {
           </div>
           <div className="card card-pad">
             <Coins size={28} color="#2f6f4e" aria-hidden="true" />
-            <h3>Fractional pricing</h3>
+            <h3>Low prices, any coin</h3>
             <p className="muted">
-              Prices can be free or as low as fractions of a cent, with checkout currently defaulting
-              to USDC on Solana through Coinpay.
+              Cookbooks can be free or cost as little as a cent. Pay with USDC, USDT, BTC, ETH, SOL and
+              more, or PayPal, on the Coinpay checkout page.
             </p>
           </div>
         </div>
