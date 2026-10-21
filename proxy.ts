@@ -23,6 +23,15 @@ export async function proxy(request: NextRequest) {
   // The status.profullstack.com health check is never metered or sold.
   if (request.nextUrl.pathname === "/api/health") return NextResponse.next();
 
+  // The pass shop: /crawl (offer, PAYMENT-REQUIRED, sales page with the CoinPay
+  // "Buy a day pass" checkout) and /crawl/checkout/*, for anyone who wants the
+  // Standard tier before they hit the free ceiling. Never metered.
+  const path = request.nextUrl.pathname;
+  if (path === "/crawl" || path.startsWith("/crawl/")) {
+    const sold = await gateAtTier(entryTier())(request);
+    if (sold) return sold;
+  }
+
   const paidTier = await tierOfRequest(request);
   const tier = paidTier ?? freeTier();
 
