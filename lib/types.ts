@@ -59,7 +59,11 @@ export type Purchase = {
   id: string;
   cookbookId: string;
   buyerSub: string;
+  /** CoinPay payment id; empty until the webhook names it for session purchases. */
   coinpayPaymentId: string;
+  /** CoinPay hosted checkout session id (cs_...). */
+  coinpaySessionId?: string;
+  buyerEmail?: string;
   amountUsd: number;
   currency: string;
   status: 'pending' | 'confirmed' | 'forwarded' | 'expired' | 'failed';

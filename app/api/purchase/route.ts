@@ -1,17 +1,21 @@
 import { NextResponse } from 'next/server';
-import { siteHref } from '@/lib/site-url';
+import { siteHref, siteUrl } from '@/lib/site-url';
 import {
-  checkoutUrlFor,
-  createCoinpayPayment,
-  paymentIdFor,
-  type CoinpayCurrency,
+  checkoutAmountUsd,
+  createCheckoutSession,
+  normalizeEmail,
 } from '@/lib/coinpay-client';
 import { getCurrentUser } from '@/lib/session';
-import { createPurchase, findCookbook, hasCookbookAccess } from '@/lib/store';
+import { createPurchase, findCookbook, hasCookbookAccess, setPurchaseSession } from '@/lib/store';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+/**
+ * Buy a cookbook: record a pending purchase, open a CoinPay hosted checkout
+ * session for it (any coin the business holds a wallet for, or PayPal) and
+ * send the buyer there. The webhook marks the purchase paid.
+ */
 export async function POST(req: Request) {
   const user = await getCurrentUser();
   if (!user) return NextResponse.redirect(siteHref('/api/coinpay/connect?next=/browse'), 302);
@@ -33,32 +37,45 @@ export async function POST(req: Request) {
     return NextResponse.redirect(siteHref(`/api/download/${cookbook.id}`), 302);
   }
 
-  const currency = (typeof form.get('currency') === 'string' ? form.get('currency') : 'usdc_sol') as CoinpayCurrency;
-  const response = await createCoinpayPayment({
-    amountUsd: cookbook.priceUsd,
-    currency,
-    description: `RecipePDFs cookbook: ${cookbook.title}`,
-    metadata: {
-      type: 'cookbook_purchase',
-      cookbook_id: cookbook.id,
-      buyer_sub: user.sub,
-    },
-  });
-  const paymentId = paymentIdFor(response);
-  const checkoutUrl = checkoutUrlFor(response);
-  if (!paymentId || !checkoutUrl) {
-    return NextResponse.json({ ok: false, error: 'Coinpay did not return checkout details' }, { status: 502 });
+  // CoinPay needs the buyer's email for the receipt; CoinPay sign-in does not
+  // always share one, so the form asks when the session has none.
+  const email = normalizeEmail(form.get('email')) ?? normalizeEmail(user.email);
+  if (!email) {
+    return NextResponse.redirect(siteHref(`/cookbooks/${cookbook.slug}?payment=email`), 303);
   }
 
-  await createPurchase({
+  const amountUsd = checkoutAmountUsd(cookbook.priceUsd);
+  const purchase = await createPurchase({
     cookbookId: cookbook.id,
     buyerSub: user.sub,
-    coinpayPaymentId: paymentId,
-    amountUsd: cookbook.priceUsd,
-    currency,
+    buyerEmail: email,
+    coinpayPaymentId: '',
+    amountUsd,
+    currency: 'USD',
     status: 'pending',
-    checkoutUrl,
   });
 
-  return NextResponse.redirect(checkoutUrl, 302);
+  let session;
+  try {
+    session = await createCheckoutSession({
+      amountUsd,
+      description: `RecipePDFs cookbook: ${cookbook.title}`,
+      customerEmail: email,
+      accountId: user.sub,
+      metadata: {
+        type: 'cookbook_purchase',
+        purchase_id: purchase.id,
+        cookbook_id: cookbook.id,
+        buyer_sub: user.sub,
+      },
+      successUrl: `${siteUrl()}/library?payment=success&session={CHECKOUT_SESSION_ID}`,
+      cancelUrl: siteHref(`/cookbooks/${cookbook.slug}?payment=cancelled`).toString(),
+    });
+  } catch (err) {
+    console.error('[purchase] CoinPay checkout session failed', err);
+    return NextResponse.json({ ok: false, error: 'Checkout is unavailable right now. Please try again.' }, { status: 502 });
+  }
+
+  await setPurchaseSession(purchase.id, session);
+  return NextResponse.redirect(session.url, 303);
 }

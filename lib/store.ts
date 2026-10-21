@@ -126,24 +126,89 @@ export async function listPurchasesForBuyer(buyerSub: string): Promise<Purchase[
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export async function markPurchaseFromWebhook(params: {
-  paymentId: string;
-  status: Purchase['status'];
-  txHash?: string | null;
-}) {
+export async function findPurchaseBySessionId(sessionId: string): Promise<Purchase | null> {
+  const data = await readJson();
+  return data.purchases.find((purchase) => purchase.coinpaySessionId === sessionId) ?? null;
+}
+
+export async function setPurchaseSession(
+  purchaseId: string,
+  session: { id: string; url: string },
+): Promise<Purchase | null> {
   const now = new Date().toISOString();
   return updateStore((data) => {
-    const purchase = data.purchases.find(
-      (item) => item.coinpayPaymentId === params.paymentId,
-    );
+    const purchase = data.purchases.find((item) => item.id === purchaseId);
     if (!purchase) return null;
+    purchase.coinpaySessionId = session.id;
+    purchase.checkoutUrl = session.url;
+    purchase.updatedAt = now;
+    return purchase;
+  });
+}
+
+const PAID: ReadonlyArray<Purchase['status']> = ['confirmed', 'forwarded'];
+
+/**
+ * Apply a CoinPay webhook to the matching purchase. Lookup: checkout session
+ * id, then our purchase id from metadata, then the CoinPay payment id (older
+ * purchases). Idempotent: a paid purchase is never downgraded, paidAt is set
+ * once. When no row matches but the session metadata names the cookbook and
+ * buyer (a paid session whose row is gone), a paid purchase is recorded from
+ * the session fields so access is still granted, exactly once.
+ */
+export async function markPurchaseFromWebhook(params: {
+  paymentId: string | null;
+  sessionId?: string | null;
+  purchaseId?: string | null;
+  status: Purchase['status'];
+  txHash?: string | null;
+  recover?: { cookbookId: string; buyerSub: string; amountUsd: number; email?: string | null } | null;
+}): Promise<{ purchase: Purchase | null; changed: boolean; created: boolean }> {
+  const now = new Date().toISOString();
+  return updateStore((data) => {
+    const purchase =
+      (params.sessionId && data.purchases.find((item) => item.coinpaySessionId === params.sessionId)) ||
+      (params.purchaseId && data.purchases.find((item) => item.id === params.purchaseId)) ||
+      (params.paymentId && data.purchases.find((item) => item.coinpayPaymentId === params.paymentId)) ||
+      null;
+
+    if (!purchase) {
+      if (!PAID.includes(params.status) || !params.recover || !params.sessionId) {
+        return { purchase: null, changed: false, created: false };
+      }
+      const created: Purchase = {
+        id: params.purchaseId || randomUUID(),
+        cookbookId: params.recover.cookbookId,
+        buyerSub: params.recover.buyerSub,
+        buyerEmail: params.recover.email ?? undefined,
+        coinpayPaymentId: params.paymentId ?? '',
+        coinpaySessionId: params.sessionId,
+        amountUsd: params.recover.amountUsd,
+        currency: 'USD',
+        status: params.status,
+        txHash: params.txHash ?? null,
+        createdAt: now,
+        updatedAt: now,
+        paidAt: now,
+      };
+      data.purchases.unshift(created);
+      return { purchase: created, changed: true, created: true };
+    }
+
+    const wasPaid = PAID.includes(purchase.status);
+    if (params.paymentId && !purchase.coinpayPaymentId) purchase.coinpayPaymentId = params.paymentId;
+    if (wasPaid && !PAID.includes(params.status)) {
+      // A late expired/failed never takes back a paid purchase.
+      return { purchase, changed: false, created: false };
+    }
+    const changed = purchase.status !== params.status;
     purchase.status = params.status;
     purchase.txHash = params.txHash ?? purchase.txHash ?? null;
     purchase.updatedAt = now;
-    if (params.status === 'confirmed' || params.status === 'forwarded') {
+    if (PAID.includes(params.status)) {
       purchase.paidAt = purchase.paidAt ?? now;
     }
-    return purchase;
+    return { purchase, changed, created: false };
   });
 }
 

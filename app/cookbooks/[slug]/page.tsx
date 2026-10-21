@@ -4,12 +4,20 @@ import { Download, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { CATEGORIES } from '@/lib/categories';
 import { formatDate, formatPrice } from '@/lib/format';
 import { getCurrentUser } from '@/lib/session';
+import { checkoutAmountUsd } from '@/lib/coinpay-client';
 import { findCookbook, hasCookbookAccess } from '@/lib/store';
 
 export const dynamic = 'force-dynamic';
 
-export default async function CookbookPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CookbookPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ payment?: string }>;
+}) {
   const { slug } = await params;
+  const { payment } = await searchParams;
   const [cookbook, user] = await Promise.all([findCookbook(slug), getCurrentUser()]);
   if (!cookbook || !cookbook.isPublished) notFound();
   const hasAccess = await hasCookbookAccess({ cookbook, userSub: user?.sub });
@@ -31,6 +39,15 @@ export default async function CookbookPage({ params }: { params: Promise<{ slug:
               </span>
             ))}
           </div>
+          {!hasAccess && payment === 'email' ? (
+            <p className="muted">Enter an email for your receipt to continue to checkout.</p>
+          ) : null}
+          {!hasAccess && payment === 'cancelled' ? (
+            <p className="muted">Checkout cancelled. You have not been charged.</p>
+          ) : null}
+          {!hasAccess && user && cookbook.priceUsd > 0 ? (
+            <p className="muted">Pay with crypto (USDC, USDT, BTC, ETH, SOL and more) or PayPal on the CoinPay checkout page.</p>
+          ) : null}
           <div className="actions">
             {hasAccess ? (
               <Link className="button" href={`/api/download/${cookbook.id}`}>
@@ -40,9 +57,20 @@ export default async function CookbookPage({ params }: { params: Promise<{ slug:
             ) : user ? (
               <form action="/api/purchase" method="post">
                 <input type="hidden" name="cookbookId" value={cookbook.id} />
+                {user.email ? null : (
+                  <input
+                    className="input"
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="Email for your receipt"
+                    aria-label="Email for your receipt"
+                    autoComplete="email"
+                  />
+                )}
                 <button className="button" type="submit">
                   <LockKeyhole size={18} aria-hidden="true" />
-                  Pay {formatPrice(cookbook.priceUsd)}
+                  Pay {formatPrice(checkoutAmountUsd(cookbook.priceUsd))}
                 </button>
               </form>
             ) : (
