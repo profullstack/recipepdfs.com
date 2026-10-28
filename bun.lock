@@ -7,7 +7,7 @@
       "dependencies": {
         "@profullstack/footer": "latest",
         "@profullstack/stack": "^0.5.0",
-        "@profullstack/x402-gateway": "^0.15.3",
+        "@profullstack/x402-gateway": "^0.16.1",
         "lucide-react": "^1.61.0",
         "next": "16.4.3",
         "posthog-js": "^1.438.23",
@@ -170,7 +170,7 @@
 
     "@profullstack/stack": ["@profullstack/stack@0.5.0", "", { "dependencies": { "@profullstack/emailer": "^1.0.1", "@profullstack/form-guard": "^0.1.1", "@profullstack/referrals": "^0.1.0" }, "peerDependencies": { "@supabase/ssr": ">=0.5.0", "next": ">=13.0.0", "react": ">=18.0.0" }, "optionalPeers": ["@supabase/ssr", "next", "react"] }, "sha512-LbXovIhyzLEq+a+y3q8KWC+jN1tJjvSoUiFEhpiEBisQn5U+iutIGHDgg16Lul74kQaFZeFlbp7CMPAVJ8KL6g=="],
 
-    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.15.3", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-YtxaHuiNdnEmwQBkNJXGOEvFUb+5k54GPeZw5RiPKqYcKrA/tRTRVTMbyuX4XSGfmaOEo1BCGpa3w8S46+YQUg=="],
+    "@profullstack/x402-gateway": ["@profullstack/x402-gateway@0.16.1", "", { "dependencies": { "@profullstack/keys": "^0.1.0" } }, "sha512-4aRbH2t5J7vJo9n6SqODNrxD0NBI7GsCo3WjTYuAfIzuPjElHB9TwtpvdpXwOneEJGpQ0JJpHght4M6F39SJng=="],
 
     "@swc/helpers": ["@swc/helpers@0.5.23", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw=="],
 
