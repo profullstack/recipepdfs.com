@@ -1,3 +1,4 @@
+import PwaRegistration from './PwaRegistration';
 import type { Metadata } from 'next';
 import { BookOpen, Upload } from 'lucide-react';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import './globals.css';
 import { getCurrentUser } from '@/lib/session';
 
 export const metadata: Metadata = {
+  manifest: '/manifest.webmanifest',
   title: 'RecipePDFs.com',
   description: 'Publish, browse, and buy free or paid recipe PDF cookbooks with Coinpay.',
 };
@@ -22,6 +24,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         <script src="https://crawlproof.com/ad.js" async></script>
       </head>
       <body>
+        <PwaRegistration />
         <div className="shell">
           <nav className="nav">
             <Link href="/" className="brand" aria-label="RecipePDFs.com home">

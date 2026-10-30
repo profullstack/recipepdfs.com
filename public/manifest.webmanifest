@@ -1,0 +1,25 @@
+{
+  "id": "/",
+  "name": "RecipePDFs.com",
+  "short_name": "RecipePDFs",
+  "description": "Publish, browse, and buy free or paid recipe PDF cookbooks with CoinPay.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#5b3aa4",
+  "theme_color": "#5b3aa4",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
