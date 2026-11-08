@@ -3,7 +3,7 @@
  * thing in <body>. Cached for an hour; any failure (timeout, non-200, odd body)
  * renders nothing so the page never breaks.
  */
-const PIT_FOOTER_URL = 'https://pit.world/snippets/footer.html?site=recipepdfs.com';
+const PIT_FOOTER_URL = 'https://pit.world/snippets/footer.html?site=recipepdfs.pwa.pit.world';
 
 export async function PitFooter() {
   try {

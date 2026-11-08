@@ -41,7 +41,7 @@ export function getCoinpayOAuthConfig(): CoinpayOAuthConfig | null {
   const appUrl = (
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.APP_URL ||
-    'https://recipepdfs.com'
+    'https://recipepdfs.pwa.pit.world'
   ).replace(/\/+$/, '');
   const redirectUri =
     process.env.COINPAY_OAUTH_REDIRECT_URI?.replace(/\/+$/, '') ||

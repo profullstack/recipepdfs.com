@@ -29,16 +29,16 @@ Register the OAuth callback in Coinpay as:
 http://localhost:3000/api/coinpay/callback
 ```
 
-For production, set `APP_URL` and `NEXT_PUBLIC_APP_URL` to `https://recipepdfs.com`, then register:
+For production, set `APP_URL` and `NEXT_PUBLIC_APP_URL` to `https://recipepdfs.pwa.pit.world`, then register:
 
 ```text
-https://recipepdfs.com/api/coinpay/callback
+https://recipepdfs.pwa.pit.world/api/coinpay/callback
 ```
 
 Set the Coinpay webhook URL to:
 
 ```text
-https://recipepdfs.com/api/webhooks/coinpay
+https://recipepdfs.pwa.pit.world/api/webhooks/coinpay
 ```
 
 ## Agent API

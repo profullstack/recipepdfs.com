@@ -9,7 +9,7 @@ describe('coinpay client', () => {
     originalEnv = { ...process.env };
     process.env.COINPAY_API_KEY = 'cp_test_key';
     process.env.COINPAY_MERCHANT_ID = 'biz_test';
-    process.env.APP_URL = 'https://recipepdfs.com';
+    process.env.APP_URL = 'https://recipepdfs.pwa.pit.world';
     fetchSpy = spyOn(globalThis, 'fetch') as never;
   });
 
@@ -33,8 +33,8 @@ describe('coinpay client', () => {
       customerEmail: 'buyer@example.com',
       accountId: 'sub_1',
       metadata: { type: 'cookbook_purchase', purchase_id: 'p_1', cookbook_id: 'cb_1', buyer_sub: 'sub_1' },
-      successUrl: 'https://recipepdfs.com/library?payment=success&session={CHECKOUT_SESSION_ID}',
-      cancelUrl: 'https://recipepdfs.com/cookbooks/tiny?payment=cancelled',
+      successUrl: 'https://recipepdfs.pwa.pit.world/library?payment=success&session={CHECKOUT_SESSION_ID}',
+      cancelUrl: 'https://recipepdfs.pwa.pit.world/cookbooks/tiny?payment=cancelled',
     });
     expect(session).toEqual({ id: 'cs_abc', url: 'https://coinpayportal.com/checkout/cs_abc' });
 
@@ -60,8 +60,8 @@ describe('coinpay client', () => {
       description: 'x',
       accountId: 'sub_1',
       metadata: {},
-      successUrl: 'https://recipepdfs.com/library',
-      cancelUrl: 'https://recipepdfs.com/browse',
+      successUrl: 'https://recipepdfs.pwa.pit.world/library',
+      cancelUrl: 'https://recipepdfs.pwa.pit.world/browse',
     };
     await expect(createCheckoutSession({ ...base, customerEmail: '' })).rejects.toThrow();
     fetchSpy.mockResolvedValueOnce(

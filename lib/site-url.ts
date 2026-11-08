@@ -8,7 +8,7 @@
  */
 const env = (name: string) => process.env[name];
 
-export const DEFAULT_SITE_URL = 'https://recipepdfs.com';
+export const DEFAULT_SITE_URL = 'https://recipepdfs.pwa.pit.world';
 
 export function siteUrl(): string {
   const raw =
