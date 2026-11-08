@@ -14,10 +14,10 @@ afterEach(() => {
 const clear = () => KEYS.forEach((k) => delete process.env[k]);
 
 describe('public URLs come from configuration, never the request host', () => {
-  it('defaults to https://recipepdfs.com', () => {
+  it('defaults to https://recipepdfs.pwa.pit.world', () => {
     clear();
-    expect(siteUrl()).toBe('https://recipepdfs.com');
-    expect(siteHref('/api/download/abc').href).toBe('https://recipepdfs.com/api/download/abc');
+    expect(siteUrl()).toBe('https://recipepdfs.pwa.pit.world');
+    expect(siteHref('/api/download/abc').href).toBe('https://recipepdfs.pwa.pit.world/api/download/abc');
   });
 
   it('honours APP_URL and trims a trailing slash', () => {
@@ -29,10 +29,10 @@ describe('public URLs come from configuration, never the request host', () => {
   it('robots.txt and /pricing print the site URL, not the bind address', async () => {
     clear();
     const text = await (await robots()).text();
-    expect(text).toContain('Sitemap: https://recipepdfs.com/llms.txt');
+    expect(text).toContain('Sitemap: https://recipepdfs.pwa.pit.world/llms.txt');
     expect(text).not.toMatch(/localhost|0\.0\.0\.0/);
     const json = JSON.stringify(await (await pricing()).json());
-    expect(json).toContain('https://recipepdfs.com/crawl');
+    expect(json).toContain('https://recipepdfs.pwa.pit.world/crawl');
     expect(json).not.toMatch(/localhost|0\.0\.0\.0/);
   });
 });

@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <AdUnit />
           {children}
           <Footer
-            site="https://recipepdfs.com/"
+            site="https://recipepdfs.pwa.pit.world/"
             links={[
               { label: 'Pricing', href: '/pricing' },
               { label: 'GitHub', href: 'https://github.com/profullstack/recipepdfs.com' },
