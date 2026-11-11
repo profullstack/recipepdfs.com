@@ -55,7 +55,7 @@ export default async function CookbookPage({
                 Download PDF
               </Link>
             ) : user ? (
-              <form action="/api/purchase" method="post">
+              <form action="/api/purchase" method="post" {...{ toolname: "buy_cookbook", tooldescription: "Start buying or claiming this cookbook PDF (opens CoinPay checkout for paid ones); the person confirms and submits" }}>
                 <input type="hidden" name="cookbookId" value={cookbook.id} />
                 {user.email ? null : (
                   <input

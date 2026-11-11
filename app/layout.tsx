@@ -22,6 +22,15 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <head>
         <script data-site="baa96667-70da-4700-9564-d0bfcec6c7ae" src="https://crawlproof.com/stats.js" async></script>
         <script src="https://crawlproof.com/ad.js" async></script>
+        {/* WebMCP: site tools + the /api/mcp server for the AI agent in the visitor's browser (@profullstack/webmcp). */}
+        <script
+          type="module"
+          data-webmcp=""
+          src="https://cdn.jsdelivr.net/npm/@profullstack/webmcp@0/src/embed.js"
+          data-mcp="/api/mcp"
+          data-search-api="/api/v1/recipes?q={query}&limit={limit}"
+          data-pages={JSON.stringify({ browse: '/browse', categories: '/categories', pricing: '/pricing', library: '/library', dashboard: '/dashboard', upload: '/upload' })}
+        />
       </head>
       <body>
         <PwaRegistration />

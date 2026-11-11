@@ -19,7 +19,7 @@ export default async function UploadPage() {
         </p>
       </div>
 
-      <form className="form card card-pad" action="/api/upload" method="post" encType="multipart/form-data">
+      <form className="form card card-pad" action="/api/upload" method="post" encType="multipart/form-data" {...{ toolname: "upload_cookbook", tooldescription: "Fill in the publish-a-cookbook form (title, description, price in USD, PDF); the person attaches the file and submits" }}>
         <div className="field">
           <label htmlFor="title">Title</label>
           <input id="title" name="title" required maxLength={120} />
