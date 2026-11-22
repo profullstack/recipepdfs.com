@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { COINPAY_UA } from './coinpay-ua';
 
 const DEFAULT_BASE_URL = 'https://coinpayportal.com';
 
@@ -73,7 +74,7 @@ export async function exchangeCodeForToken(
 ): Promise<CoinpayTokenResponse> {
   const res = await fetch(`${cfg.baseUrl}/api/oauth/token`, {
     method: 'POST',
-    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    headers: { 'content-type': 'application/x-www-form-urlencoded', 'user-agent': COINPAY_UA },
     body: new URLSearchParams({
       grant_type: 'authorization_code',
       code,
@@ -95,7 +96,7 @@ export async function fetchUserInfo(
   accessToken: string,
 ): Promise<CoinpayUserInfo> {
   const res = await fetch(`${cfg.baseUrl}/api/oauth/userinfo`, {
-    headers: { authorization: `Bearer ${accessToken}` },
+    headers: { authorization: `Bearer ${accessToken}`, 'user-agent': COINPAY_UA },
     cache: 'no-store',
   });
   if (!res.ok) {
