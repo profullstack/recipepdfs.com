@@ -8,6 +8,7 @@
  * The webhook (app/api/webhooks/coinpay) settles by data.checkout_session_id,
  * then metadata.purchase_id, then the CoinPay payment id (older purchases).
  */
+import { COINPAY_UA } from './coinpay-ua';
 
 const DEFAULT_COINPAY_API_URL = 'https://coinpayportal.com/api';
 
@@ -86,7 +87,7 @@ export async function createCheckoutSession(
   const api = apiUrl();
   const res = await fetchImpl(`${api}/checkout/sessions`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey()}` },
+    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey()}`, 'user-agent': COINPAY_UA },
     cache: 'no-store',
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(10_000),
