@@ -52,7 +52,7 @@ export function gatewayForTier(tier: Tier) {
     isPaidAgent: () => true,
     // Discovery stays readable even to a caller who is over the limit,
     // otherwise an agent that has just been refused cannot read why.
-    openPaths: ["/llms.txt", "/pricing"],
+    openPaths: ["/llms.txt", "/pricing", "/robots.txt", "/sitemap.xml"],
   });
 
   gateways.set(tier.id, gateway);
