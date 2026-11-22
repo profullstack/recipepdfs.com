@@ -37,7 +37,7 @@ ${tierLines}
 User-agent: *
 Allow: /
 
-Sitemap: ${origin}/llms.txt
+Sitemap: ${origin}/sitemap.xml
 `;
 
   return new Response(body, {

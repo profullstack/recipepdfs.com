@@ -29,7 +29,8 @@ describe('public URLs come from configuration, never the request host', () => {
   it('robots.txt and /pricing print the site URL, not the bind address', async () => {
     clear();
     const text = await (await robots()).text();
-    expect(text).toContain('Sitemap: https://recipepdfs.pwa.pit.world/llms.txt');
+    expect(text).toContain('Sitemap: https://recipepdfs.pwa.pit.world/sitemap.xml');
+    expect(text).not.toContain('Sitemap: https://recipepdfs.pwa.pit.world/llms.txt');
     expect(text).not.toMatch(/localhost|0\.0\.0\.0/);
     const json = JSON.stringify(await (await pricing()).json());
     expect(json).toContain('https://recipepdfs.pwa.pit.world/crawl');
